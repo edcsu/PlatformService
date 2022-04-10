@@ -28,9 +28,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Business\Platform\" />
     <Folder Include="Core\" />
-    <Folder Include="Data\" />
   </ItemGroup>
 
 </Project>
