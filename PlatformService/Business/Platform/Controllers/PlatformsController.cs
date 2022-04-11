@@ -36,7 +36,7 @@ namespace PlatformService.Business.Platform.Controllers
         {
             var result = _platformService.CreatePlatformAsync(createModel);
 
-            return result is null ? NotFound() : Ok(result);
+            return CreatedAtRoute(nameof(GetPlatform), new { Id = result.Id}, result);
         }
 
         [HttpPut(template: "{id:guid}", Name = "UpdatePlatform")]
