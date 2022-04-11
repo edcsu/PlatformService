@@ -1,4 +1,6 @@
 using Microsoft.EntityFrameworkCore;
+using PlatformService.Business.Platform.Repositories.Implementations;
+using PlatformService.Business.Platform.Repositories.Interfaces;
 using PlatformService.Data.Context;
 using Serilog;
 using Serilog.Core;
@@ -36,6 +38,8 @@ try
     // Add services to the container.
 
     builder.Services.AddControllers();
+
+    builder.Services.AddScoped<IPlatformRepository, PlatformRepository>();
 
     builder.Services.AddDbContext<ApplicationDbContext>(options =>
        options.UseInMemoryDatabase("inmem"));
