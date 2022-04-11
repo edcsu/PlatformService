@@ -1,32 +1,74 @@
 using Microsoft.EntityFrameworkCore;
 using PlatformService.Data.Context;
+using Serilog;
+using Serilog.Core;
+using Serilog.Exceptions;
+using Serilog.Exceptions.Core;
+using Serilog.Exceptions.EntityFrameworkCore.Destructurers;
+using Serilog.Exceptions.SqlServer.Destructurers;
 
-var builder = WebApplication.CreateBuilder(args);
-
-// Add services to the container.
-
-builder.Services.AddControllers();
-
-builder.Services.AddDbContext<ApplicationDbContext>( options => 
-    options.UseInMemoryDatabase("inmem"));
-
-// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
-builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
-
-var app = builder.Build();
-
-// Configure the HTTP request pipeline.
-if (app.Environment.IsDevelopment())
+try
 {
-    app.UseSwagger();
-    app.UseSwaggerUI();
+    var builder = WebApplication.CreateBuilder(args);
+
+    var logger = new LoggerConfiguration()
+        .Enrich.WithThreadId()
+        .Enrich.WithMachineName()
+        .Enrich.WithEnvironmentName()
+        .Enrich.WithThreadName()
+        .Enrich.WithClientAgent()
+        .Enrich.WithClientIp()
+        .Enrich.WithEnvironmentUserName()
+        .Enrich.WithProcessId()
+        .Enrich.WithProcessName()
+        .Enrich.WithExceptionDetails(
+            new DestructuringOptionsBuilder()
+            .WithDefaultDestructurers()
+            .WithDestructurers(new[] { new DbUpdateExceptionDestructurer() })
+            .WithDestructurers(new[] { new SqlExceptionDestructurer() }))
+        .ReadFrom.Configuration(builder.Configuration)
+        .Enrich.FromLogContext()
+        .CreateBootstrapLogger();
+
+    builder.Logging.ClearProviders();
+    builder.Host.UseSerilog(logger);
+
+    // Add services to the container.
+
+    builder.Services.AddControllers();
+
+    builder.Services.AddDbContext<ApplicationDbContext>(options =>
+       options.UseInMemoryDatabase("inmem"));
+
+    // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
+    builder.Services.AddEndpointsApiExplorer();
+    builder.Services.AddSwaggerGen();
+
+    var app = builder.Build();
+
+    // Configure the HTTP request pipeline.
+    if (app.Environment.IsDevelopment())
+    {
+        app.UseSwagger();
+        app.UseSwaggerUI();
+    }
+
+    app.UseSerilogRequestLogging();
+
+    app.UseHttpsRedirection();
+
+    app.UseAuthorization();
+
+    app.MapControllers();
+
+    app.Run();
 }
-
-app.UseHttpsRedirection();
-
-app.UseAuthorization();
-
-app.MapControllers();
-
-app.Run();
+catch (Exception ex)
+{
+    Log.Fatal(ex, "Unhandled exception");
+}
+finally
+{
+    Log.Information("Shut down complete");
+    Log.CloseAndFlush();
+}
