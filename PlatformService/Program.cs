@@ -1,6 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using PlatformService.Business.Platform.Repositories.Implementations;
 using PlatformService.Business.Platform.Repositories.Interfaces;
+using PlatformService.Business.Platform.Services.PlatformService;
 using PlatformService.Data;
 using PlatformService.Data.Context;
 using Serilog;
@@ -40,6 +41,8 @@ try
     builder.Services.AddControllers();
 
     builder.Services.AddScoped<IPlatformRepository, PlatformRepository>();
+
+    builder.Services.AddScoped<IPlatformService, PlatformService.Business.Platform.Services.PlatformService.PlatformService>();
 
     builder.Services.AddDbContext<ApplicationDbContext>(options =>
        options.UseInMemoryDatabase("inmem"));

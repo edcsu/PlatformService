@@ -9,5 +9,7 @@
         Models.Platform? GetPlatformById(Guid id);
 
         void CreatePlatform(Models.Platform platform);
+
+        void UpdatePlatform(Models.Platform platform);
     }
 }

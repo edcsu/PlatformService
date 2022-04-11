@@ -31,5 +31,10 @@ namespace PlatformService.Business.Platform.Repositories.Implementations
         {
             return (_context.SaveChanges() >= 0);
         }
+
+        public void UpdatePlatform(Models.Platform platform)
+        {
+            _context.Platforms.Update(platform);
+        }
     }
 }

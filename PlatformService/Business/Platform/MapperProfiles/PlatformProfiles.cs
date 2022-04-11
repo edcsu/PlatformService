@@ -11,6 +11,8 @@ namespace PlatformService.Business.Platform.MapperProfiles
             CreateMap<Models.Platform, PlatformDetails>();
             
             CreateMap<PlatformCreate, Models.Platform>();
+
+            CreateMap<PlatformUpdate, Models.Platform>();
         }
     }
 }
