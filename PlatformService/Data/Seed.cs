@@ -39,7 +39,7 @@ namespace PlatformService.Data
                     {
                         Id = Guid.NewGuid(),
                         Name = "Kubernetes",
-                        Publisher = "Vloud Native Computing Foundation",
+                        Publisher = "Cloud Native Computing Foundation",
                         Cost = "Free",
                         Created = DateTime.UtcNow.AddDays(-90),
                         Updated = DateTime.UtcNow.AddDays(-5),
