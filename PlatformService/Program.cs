@@ -1,9 +1,9 @@
 using Microsoft.EntityFrameworkCore;
 using PlatformService.Business.Platform.Repositories.Implementations;
 using PlatformService.Business.Platform.Repositories.Interfaces;
+using PlatformService.Data;
 using PlatformService.Data.Context;
 using Serilog;
-using Serilog.Core;
 using Serilog.Exceptions;
 using Serilog.Exceptions.Core;
 using Serilog.Exceptions.EntityFrameworkCore.Destructurers;
@@ -64,6 +64,8 @@ try
     app.UseAuthorization();
 
     app.MapControllers();
+
+    Seed.PopulateDb(app);
 
     app.Run();
 }
