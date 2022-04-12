@@ -17,13 +17,13 @@ namespace PlatformService.Business.Platform.Services.PlatformService
             _logger = logger;
         }
 
-        public PlatformDetails CreatePlatformAsync(PlatformCreate platformCreate)
+        public async Task<PlatformDetails> CreatePlatformAsync(PlatformCreate platformCreate)
         {
             var platform = _mapper.Map<Models.Platform>(platformCreate);
             platform.Created = DateTime.UtcNow;
             
             _platformRepository.CreatePlatform(platform);
-            _platformRepository.SaveChanges();
+            await _platformRepository.SaveChangesAsync();
             _logger.LogInformation("Created a new platform with id:{PlatformId}", platform.Id);
             
             return _mapper.Map<PlatformDetails>(platform);
@@ -41,7 +41,7 @@ namespace PlatformService.Business.Platform.Services.PlatformService
             return _mapper.Map<PlatformDetails>(platform);
         }
 
-        public PlatformDetails? UpdatePlatformAsync(Guid id, PlatformUpdate platformUpdate)
+        public async Task<PlatformDetails?> UpdatePlatformAsync(Guid id, PlatformUpdate platformUpdate)
         {
             var platform = _platformRepository.GetPlatformById(id);
             if (platform is null)
@@ -55,7 +55,7 @@ namespace PlatformService.Business.Platform.Services.PlatformService
             updatedPlatform.Updated = DateTime.UtcNow;
 
             _platformRepository.UpdatePlatform(updatedPlatform);
-            _platformRepository.SaveChanges();
+            await _platformRepository.SaveChangesAsync();
             _logger.LogInformation("Updated a new platform with id:{PlatformId}", updatedPlatform.Id);
 
             return _mapper.Map<PlatformDetails>(updatedPlatform);

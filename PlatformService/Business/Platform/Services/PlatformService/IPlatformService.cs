@@ -8,8 +8,8 @@ namespace PlatformService.Business.Platform.Services.PlatformService
 
         PlatformDetails? GetPlatformByIdAsync(Guid id);
 
-        PlatformDetails CreatePlatformAsync(PlatformCreate platformCreate);
-        
-        PlatformDetails? UpdatePlatformAsync(Guid id, PlatformUpdate platformUpdate);
+        Task<PlatformDetails> CreatePlatformAsync(PlatformCreate platformCreate);
+
+        Task<PlatformDetails?> UpdatePlatformAsync(Guid id, PlatformUpdate platformUpdate);
     }
 }

@@ -27,9 +27,9 @@ namespace PlatformService.Business.Platform.Repositories.Implementations
             return _context.Platforms.FirstOrDefault(p => p.Id == id);
         }
 
-        public bool SaveChanges()
+        public async Task<bool> SaveChangesAsync()
         {
-            return (_context.SaveChanges() >= 0);
+            return (await _context.SaveChangesAsync() >= 0);
         }
 
         public void UpdatePlatform(Models.Platform platform)

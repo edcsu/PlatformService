@@ -2,7 +2,7 @@
 {
     public interface IPlatformRepository
     {
-        bool SaveChanges();
+        Task<bool> SaveChangesAsync();
 
         IEnumerable<Models.Platform> GetAllPlatforms();
 
