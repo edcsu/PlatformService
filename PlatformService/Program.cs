@@ -1,10 +1,12 @@
 using Microsoft.EntityFrameworkCore;
+using PlatformService.Business.Platform.Config;
 using PlatformService.Business.Platform.Repositories.Implementations;
 using PlatformService.Business.Platform.Repositories.Interfaces;
 using PlatformService.Business.Platform.Services.PlatformService;
 using PlatformService.Core;
 using PlatformService.Data;
 using PlatformService.Data.Context;
+using PlatformService.DataServices.CommandService;
 using Serilog;
 using Serilog.Exceptions;
 using Serilog.Exceptions.Core;
@@ -44,6 +46,19 @@ try
     builder.Services.AddScoped<IPlatformRepository, PlatformRepository>();
 
     builder.Services.AddScoped<IPlatformService, PlatformService.Business.Platform.Services.PlatformService.PlatformService>();
+
+    builder.Services.Configure<CommandServiceConfig>(options => builder.Configuration
+                .GetSection(CommandServiceConfig.ConfigurationName)
+                .Bind(options));
+
+    // Inject Command Client
+    var commandServiceConfig = builder.Configuration.GetCommandServiceConfig();
+    builder.Services.AddHttpClient<CommandClient>(c =>
+    {
+        c.BaseAddress = new Uri(commandServiceConfig.BaseUrl);
+    })
+    .AddPolicyHandler(PollyPolicies.GetRetryPolicy())
+    .AddPolicyHandler(PollyPolicies.GetCircuitBreakerPolicy());
 
     builder.Services.AddDbContext<ApplicationDbContext>(options =>
        options.UseInMemoryDatabase("inmem"));

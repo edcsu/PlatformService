@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using PlatformService.Business.Platform.Repositories.Interfaces;
 using PlatformService.Business.Platform.ViewModels;
+using PlatformService.DataServices.CommandService;
 
 namespace PlatformService.Business.Platform.Services.PlatformService
 {
@@ -9,12 +10,17 @@ namespace PlatformService.Business.Platform.Services.PlatformService
         private readonly IPlatformRepository _platformRepository;
         private readonly IMapper _mapper;
         private readonly ILogger<PlatformService> _logger;
+        private readonly CommandClient _commandClient;
 
-        public PlatformService(IPlatformRepository platformRepository, IMapper mapper, ILogger<PlatformService> logger)
+        public PlatformService(IPlatformRepository platformRepository,
+            IMapper mapper, 
+            ILogger<PlatformService> logger, 
+            CommandClient commandClient)
         {
             _platformRepository = platformRepository;
             _mapper = mapper;
             _logger = logger;
+            _commandClient = commandClient;
         }
 
         public async Task<PlatformDetails> CreatePlatformAsync(PlatformCreate platformCreate)
@@ -25,8 +31,11 @@ namespace PlatformService.Business.Platform.Services.PlatformService
             _platformRepository.CreatePlatform(platform);
             await _platformRepository.SaveChangesAsync();
             _logger.LogInformation("Created a new platform with id:{PlatformId}", platform.Id);
-            
-            return _mapper.Map<PlatformDetails>(platform);
+
+            var platformDetails = _mapper.Map<PlatformDetails>(platform);
+            await _commandClient.SendPlatformAsync(platformDetails);
+           
+            return platformDetails;
         }
 
         public IEnumerable<PlatformDetails> GetAllPlatformsAsync()
