@@ -14,7 +14,7 @@ spec:
     spec:
       containers:
         - name: platformservice
-          image: skelevel/platformservice:v1.0.2
+          image: skelevel/platformservice:v1.0.3
 ---
 apiVersion: v1
 kind: Service
