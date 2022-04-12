@@ -32,17 +32,17 @@ namespace PlatformService.Business.Platform.Controllers
         }
 
         [HttpPost(Name = "CreatePlatform")]
-        public ActionResult<PlatformDetails> CreatePlatform([FromBody] PlatformCreate createModel)
+        public async Task<ActionResult<PlatformDetails>> CreatePlatform([FromBody] PlatformCreate createModel)
         {
-            var result = _platformService.CreatePlatformAsync(createModel);
+            var result = await _platformService.CreatePlatformAsync(createModel);
 
             return CreatedAtRoute(nameof(GetPlatform), new { Id = result.Id}, result);
         }
 
         [HttpPut(template: "{id:guid}", Name = "UpdatePlatform")]
-        public ActionResult<PlatformDetails> UpdatePlatform( [FromRoute] Guid id, [FromBody] PlatformUpdate platformUpdate)
+        public async Task<ActionResult<PlatformDetails>> UpdatePlatform( [FromRoute] Guid id, [FromBody] PlatformUpdate platformUpdate)
         {
-            var result = _platformService.UpdatePlatformAsync(id, platformUpdate);
+            var result = await _platformService.UpdatePlatformAsync(id, platformUpdate);
 
             return result is null ? NotFound() : Ok(result);
         }

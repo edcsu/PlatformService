@@ -5,23 +5,24 @@ namespace PlatformService.DataServices.CommandService
 {
     public class CommandClient
     {
-        private readonly IHttpClientFactory _httpClientFactory;
+        private readonly HttpClient _httpClient;
         private readonly ILogger<CommandClient> _logger;
         private readonly IOptions<CommandServiceConfig> _commandOptions;
 
-        public CommandClient(IHttpClientFactory httpClientFactory, 
+        public CommandClient(HttpClient httpClient, 
             ILogger<CommandClient> logger, 
             IOptions<CommandServiceConfig> commandOptions)
         {
-            _httpClientFactory = httpClientFactory;
             _logger = logger;
             _commandOptions = commandOptions;
+
+            _httpClient = httpClient;
+            _httpClient.BaseAddress = new Uri(_commandOptions.Value.BaseUrl);
         }
 
         public async Task SendPlatformAsync(PlatformDetails platformDetails)
         {
-            var httpClient = _httpClientFactory.CreateClient(_commandOptions.Value.ClientName);
-            var httpResponseMessage = await httpClient.PostAsJsonAsync(_commandOptions.Value.PlatformsEndpoint, platformDetails);
+            var httpResponseMessage = await _httpClient.PostAsJsonAsync(_commandOptions.Value.PlatformsEndpoint, platformDetails);
 
             if (httpResponseMessage.IsSuccessStatusCode)
             {

@@ -1,5 +1,4 @@
 using Microsoft.EntityFrameworkCore;
-using PlatformService.Business.Platform.Config;
 using PlatformService.Business.Platform.Repositories.Implementations;
 using PlatformService.Business.Platform.Repositories.Interfaces;
 using PlatformService.Business.Platform.Services.PlatformService;
@@ -52,13 +51,9 @@ try
                 .Bind(options));
 
     // Inject Command Client
-    var commandServiceConfig = builder.Configuration.GetCommandServiceConfig();
-    builder.Services.AddHttpClient<CommandClient>(c =>
-    {
-        c.BaseAddress = new Uri(commandServiceConfig.BaseUrl);
-    })
-    .AddPolicyHandler(PollyPolicies.GetRetryPolicy())
-    .AddPolicyHandler(PollyPolicies.GetCircuitBreakerPolicy());
+    builder.Services.AddHttpClient<CommandClient>()
+        .AddPolicyHandler(PollyPolicies.GetRetryPolicy())
+        .AddPolicyHandler(PollyPolicies.GetCircuitBreakerPolicy());
 
     builder.Services.AddDbContext<ApplicationDbContext>(options =>
        options.UseInMemoryDatabase("inmem"));
