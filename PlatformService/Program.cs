@@ -2,6 +2,7 @@ using Microsoft.EntityFrameworkCore;
 using PlatformService.Business.Platform.Repositories.Implementations;
 using PlatformService.Business.Platform.Repositories.Interfaces;
 using PlatformService.Business.Platform.Services.PlatformService;
+using PlatformService.Core;
 using PlatformService.Data;
 using PlatformService.Data.Context;
 using Serilog;
@@ -61,6 +62,8 @@ try
         app.UseSwagger();
         app.UseSwaggerUI();
     }
+    
+    app.UseGlobalErrorHandler();
 
     app.UseSerilogRequestLogging();
 
