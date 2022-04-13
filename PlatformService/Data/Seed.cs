@@ -1,18 +1,24 @@
-﻿using PlatformService.Data.Context;
+﻿using Microsoft.EntityFrameworkCore;
+using PlatformService.Data.Context;
 using Serilog;
 
 namespace PlatformService.Data
 {
     public static class Seed
     {
-        public static void PopulateDb(IApplicationBuilder app)
+        public static void PopulateDb(IApplicationBuilder app, bool isProd)
         {
             using var serviceScope = app.ApplicationServices.CreateScope();
-            SeedData(serviceScope.ServiceProvider.GetService<ApplicationDbContext>()!);
+            SeedData(serviceScope.ServiceProvider.GetService<ApplicationDbContext>()!, isProd);
         }
 
-        private static void SeedData(ApplicationDbContext context)
+        private static void SeedData(ApplicationDbContext context, bool isProd)
         {
+            if (isProd)
+            {
+                Log.Information("Trying to apply migraations to Database");
+                context.Database.Migrate();
+            }
             if (!context.Platforms.Any())
             {
                 Log.Information("Seeding data to Database");

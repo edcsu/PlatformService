@@ -7,6 +7,7 @@ using PlatformService.Data;
 using PlatformService.Data.Context;
 using PlatformService.DataServices.CommandService;
 using Serilog;
+using Serilog.Debugging;
 using Serilog.Exceptions;
 using Serilog.Exceptions.Core;
 using Serilog.Exceptions.EntityFrameworkCore.Destructurers;
@@ -15,6 +16,8 @@ using Serilog.Exceptions.SqlServer.Destructurers;
 try
 {
     var builder = WebApplication.CreateBuilder(args);
+    
+    SelfLog.Enable(Console.WriteLine);
 
     var logger = new LoggerConfiguration()
         .Enrich.WithThreadId()
@@ -55,8 +58,19 @@ try
         .AddPolicyHandler(PollyPolicies.GetRetryPolicy())
         .AddPolicyHandler(PollyPolicies.GetCircuitBreakerPolicy());
 
-    builder.Services.AddDbContext<ApplicationDbContext>(options =>
-       options.UseInMemoryDatabase("inmem"));
+    var isProd = builder.Environment.IsProduction();
+    if (isProd)
+    {
+        Log.Information("Using in sqlserver db");
+        builder.Services.AddDbContext<ApplicationDbContext>(options =>
+         options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+    }
+    else
+    {
+        Log.Information("Using in memory db");
+        builder.Services.AddDbContext<ApplicationDbContext>(options =>
+         options.UseInMemoryDatabase("inmem"));
+    }
 
     builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 
@@ -83,7 +97,7 @@ try
 
     app.MapControllers();
 
-    Seed.PopulateDb(app);
+    Seed.PopulateDb(app, isProd);
 
     app.Run();
 }
