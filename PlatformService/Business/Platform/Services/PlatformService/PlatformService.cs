@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using PlatformService.AsyncDataServices;
 using PlatformService.Business.Platform.Repositories.Interfaces;
 using PlatformService.Business.Platform.ViewModels;
 using PlatformService.DataServices.CommandService;
@@ -11,16 +12,19 @@ namespace PlatformService.Business.Platform.Services.PlatformService
         private readonly IMapper _mapper;
         private readonly ILogger<PlatformService> _logger;
         private readonly CommandClient _commandClient;
+        private readonly IMessageBusClient _messageBusClient;
 
         public PlatformService(IPlatformRepository platformRepository,
-            IMapper mapper, 
-            ILogger<PlatformService> logger, 
-            CommandClient commandClient)
+            IMapper mapper,
+            ILogger<PlatformService> logger,
+            CommandClient commandClient, 
+            IMessageBusClient messageBusClient)
         {
             _platformRepository = platformRepository;
             _mapper = mapper;
             _logger = logger;
             _commandClient = commandClient;
+            _messageBusClient = messageBusClient;
         }
 
         public async Task<PlatformDetails> CreatePlatformAsync(PlatformCreate platformCreate)
@@ -33,8 +37,33 @@ namespace PlatformService.Business.Platform.Services.PlatformService
             _logger.LogInformation("Created a new platform with id:{PlatformId}", platform.Id);
 
             var platformDetails = _mapper.Map<PlatformDetails>(platform);
-            await _commandClient.SendPlatformAsync(platformDetails);
-           
+
+            // Send sync message
+            try
+            {
+                await _commandClient.SendPlatformAsync(platformDetails);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogInformation(ex, "Failed to send new platform details with id:{PlatformId} synchronously", platform.Id);
+                //throw;
+            }
+
+            // send async
+            try
+            {
+                var publishedDto = _mapper.Map<PlatformPublished>(platformDetails);
+                publishedDto.Event = PlatformEvents.PlatFormPublished;
+
+                _messageBusClient.PublishNewPlatform(publishedDto);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogInformation(ex, "Failed to send new platform details with id:{PlatformId} async", platform.Id);
+
+                //throw;
+            }
+
             return platformDetails;
         }
 
