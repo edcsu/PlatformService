@@ -13,6 +13,8 @@ namespace PlatformService.Business.Platform.MapperProfiles
             CreateMap<PlatformCreate, Models.Platform>();
 
             CreateMap<PlatformUpdate, Models.Platform>();
+
+            CreateMap<PlatformDetails, PlatformPublished>();
         }
     }
 }
