@@ -1,4 +1,5 @@
 using Microsoft.EntityFrameworkCore;
+using PlatformService.Business.Platform.Config;
 using PlatformService.Business.Platform.Repositories.Implementations;
 using PlatformService.Business.Platform.Repositories.Interfaces;
 using PlatformService.Business.Platform.Services.PlatformService;
@@ -19,7 +20,7 @@ try
     
     SelfLog.Enable(Console.WriteLine);
 
-    var logger = new LoggerConfiguration()
+    Log.Logger = new LoggerConfiguration()
         .Enrich.WithThreadId()
         .Enrich.WithMachineName()
         .Enrich.WithEnvironmentName()
@@ -34,12 +35,17 @@ try
             .WithDefaultDestructurers()
             .WithDestructurers(new[] { new DbUpdateExceptionDestructurer() })
             .WithDestructurers(new[] { new SqlExceptionDestructurer() }))
-        .ReadFrom.Configuration(builder.Configuration)
         .Enrich.FromLogContext()
+        .WriteTo.Console()
         .CreateBootstrapLogger();
 
+    var seqConfig = builder.Configuration.GetSeqSettings();
+
     builder.Logging.ClearProviders();
-    builder.Host.UseSerilog(logger);
+    builder.Host.UseSerilog((ctx, lc) => lc
+        .WriteTo.Console()
+        .WriteTo.Seq(seqConfig.Url)
+        .ReadFrom.Configuration(ctx.Configuration));
 
     // Add services to the container.
 

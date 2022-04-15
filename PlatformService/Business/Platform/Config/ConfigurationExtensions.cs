@@ -8,5 +8,10 @@ namespace PlatformService.Business.Platform.Config
         {
             return configuration.GetSection("CommandServiceConfig").Get<CommandServiceConfig>();
         }
+
+        public static SeqConfig GetSeqSettings(this IConfiguration configuration)
+        {
+            return configuration.GetSection("Seq").Get<SeqConfig>();
+        }
     }
 }
