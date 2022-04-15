@@ -1,4 +1,5 @@
 using Microsoft.EntityFrameworkCore;
+using PlatformService.AsyncDataServices;
 using PlatformService.Business.Platform.Config;
 using PlatformService.Business.Platform.Repositories.Implementations;
 using PlatformService.Business.Platform.Repositories.Interfaces;
@@ -63,6 +64,8 @@ try
     builder.Services.AddHttpClient<CommandClient>()
         .AddPolicyHandler(PollyPolicies.GetRetryPolicy())
         .AddPolicyHandler(PollyPolicies.GetCircuitBreakerPolicy());
+
+    builder.Services.AddSingleton<IMessageBusClient, MessageBusClient>();
 
     var isProd = builder.Environment.IsProduction();
     if (isProd)
