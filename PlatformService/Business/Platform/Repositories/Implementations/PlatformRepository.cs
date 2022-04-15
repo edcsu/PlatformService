@@ -29,7 +29,7 @@ namespace PlatformService.Business.Platform.Repositories.Implementations
 
         public async Task<bool> SaveChangesAsync()
         {
-            return (await _context.SaveChangesAsync() >= 0);
+            return await _context.SaveChangesAsync() >= 0;
         }
 
         public void UpdatePlatform(Models.Platform platform)
