@@ -37,7 +37,6 @@ try
             .WithDestructurers(new[] { new DbUpdateExceptionDestructurer() })
             .WithDestructurers(new[] { new SqlExceptionDestructurer() }))
         .Enrich.FromLogContext()
-        .WriteTo.Console()
         .CreateBootstrapLogger();
 
     var seqConfig = builder.Configuration.GetSeqSettings();
