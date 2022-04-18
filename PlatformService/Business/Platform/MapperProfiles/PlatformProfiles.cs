@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using PlatformService.Business.Platform.Protos;
 using PlatformService.Business.Platform.ViewModels;
 
 namespace PlatformService.Business.Platform.MapperProfiles
@@ -15,6 +16,9 @@ namespace PlatformService.Business.Platform.MapperProfiles
             CreateMap<PlatformUpdate, Models.Platform>();
 
             CreateMap<PlatformDetails, PlatformPublished>();
+
+            CreateMap<Models.Platform, GrpcPlatformModel>()
+                .ForMember(dest => dest.PlatformId, options => options.MapFrom(src => src.Id.ToString()));
         }
     }
 }
