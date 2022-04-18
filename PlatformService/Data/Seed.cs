@@ -16,7 +16,7 @@ namespace PlatformService.Data
         {
             if (isProd)
             {
-                Log.Information("Trying to apply migraations to Database");
+                Log.Information("Trying to apply migrations to Database");
                 context.Database.Migrate();
             }
             if (!context.Platforms.Any())
