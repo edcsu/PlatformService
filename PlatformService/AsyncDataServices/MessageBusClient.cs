@@ -10,9 +10,11 @@ namespace PlatformService.AsyncDataServices
     {
         private readonly IConfiguration _configuration;
         private readonly ILogger<MessageBusClient> _logger;
+        private const string exchangeName = "trigger";
+#nullable disable
         private readonly IConnection _connection;
         private readonly IModel _channel;
-        private const string exchangeName = "trigger";
+#nullable enable
         public MessageBusClient(IConfiguration configuration, 
             ILogger<MessageBusClient> logger)
         {
@@ -41,7 +43,7 @@ namespace PlatformService.AsyncDataServices
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Failed to connect to rabbitmq");
-                throw;
+                //throw;
             }
         }
 

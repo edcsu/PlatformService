@@ -13,18 +13,20 @@ namespace PlatformService.Business.Platform.Services.PlatformService
         private readonly ILogger<PlatformService> _logger;
         private readonly CommandClient _commandClient;
         private readonly IMessageBusClient _messageBusClient;
+        private readonly IWebHostEnvironment _webHostEnvironment;
 
         public PlatformService(IPlatformRepository platformRepository,
             IMapper mapper,
             ILogger<PlatformService> logger,
-            CommandClient commandClient, 
-            IMessageBusClient messageBusClient)
+            CommandClient commandClient,
+            IMessageBusClient messageBusClient, IWebHostEnvironment webHostEnvironment)
         {
             _platformRepository = platformRepository;
             _mapper = mapper;
             _logger = logger;
             _commandClient = commandClient;
             _messageBusClient = messageBusClient;
+            _webHostEnvironment = webHostEnvironment;
         }
 
         public async Task<PlatformDetails> CreatePlatformAsync(PlatformCreate platformCreate)
@@ -39,14 +41,17 @@ namespace PlatformService.Business.Platform.Services.PlatformService
             var platformDetails = _mapper.Map<PlatformDetails>(platform);
 
             // Send sync message
-            try
+            if (_webHostEnvironment.IsDevelopment())
             {
-                await _commandClient.SendPlatformAsync(platformDetails);
-            }
-            catch (Exception ex)
-            {
-                _logger.LogInformation(ex, "Failed to send new platform details with id:{PlatformId} synchronously", platform.Id);
-                //throw;
+                try
+                {
+                    await _commandClient.SendPlatformAsync(platformDetails);
+                }
+                catch (Exception ex)
+                {
+                    _logger.LogInformation(ex, "Failed to send new platform details with id:{PlatformId} synchronously", platform.Id);
+                    //throw;
+                }
             }
 
             // send async
@@ -54,6 +59,8 @@ namespace PlatformService.Business.Platform.Services.PlatformService
             {
                 var publishedDto = _mapper.Map<PlatformPublished>(platformDetails);
                 publishedDto.Event = PlatformEvents.PlatFormPublished;
+
+                _logger.LogInformation("Sending new platform details with id:{PlatformId} to commands service", platform.Id);
 
                 _messageBusClient.PublishNewPlatform(publishedDto);
             }
