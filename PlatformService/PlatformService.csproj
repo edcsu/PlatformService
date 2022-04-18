@@ -11,6 +11,7 @@
   <ItemGroup>
     <PackageReference Include="AutoMapper.Extensions.Microsoft.DependencyInjection" Version="11.0.0" />
     <PackageReference Include="Collector.Serilog.Enrichers.Correlation" Version="2.1.0" />
+    <PackageReference Include="Grpc.AspNetCore" Version="2.44.0" />
     <PackageReference Include="Microsoft.EntityFrameworkCore" Version="6.0.3" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Abstractions" Version="6.0.3" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Analyzers" Version="6.0.3" />
