@@ -8,6 +8,7 @@ using PlatformService.Core;
 using PlatformService.Data;
 using PlatformService.Data.Context;
 using PlatformService.DataServices.CommandService;
+using PlatformService.DataServices.Grpc;
 using Serilog;
 using Serilog.Debugging;
 using Serilog.Exceptions;
@@ -66,6 +67,8 @@ try
 
     builder.Services.AddSingleton<IMessageBusClient, MessageBusClient>();
 
+    builder.Services.AddGrpc();
+
     var isProd = builder.Environment.IsProduction();
     if (isProd)
     {
@@ -104,6 +107,13 @@ try
     app.UseAuthorization();
 
     app.MapControllers();
+
+    app.MapGrpcService<GrpcPlatformSerivce>();
+
+    app.MapGet("api/protos/platforms.proto", async (context) =>
+    {
+        await context.Response.WriteAsync(await File.ReadAllTextAsync("Business/Platform/Protos/platforms.proto"));
+    });
 
     Seed.PopulateDb(app, isProd);
 

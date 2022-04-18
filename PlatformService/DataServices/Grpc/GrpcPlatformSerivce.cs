@@ -2,7 +2,6 @@
 using Grpc.Core;
 using PlatformService.Business.Platform.Protos;
 using PlatformService.Business.Platform.Repositories.Interfaces;
-using PlatformService.Business.Platform.Services.PlatformService;
 
 namespace PlatformService.DataServices.Grpc
 {
