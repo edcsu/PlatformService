@@ -14,7 +14,7 @@ spec:
     spec:
       containers:
         - name: platformservice
-          image: skelevel/platformservice:v1.0.10
+          image: skelevel/platformservicefinal
 ---
 apiVersion: v1
 kind: Service
@@ -33,5 +33,5 @@ spec:
     protocol: TCP
     port: 402
     targetPort: 402
- 
+
 
